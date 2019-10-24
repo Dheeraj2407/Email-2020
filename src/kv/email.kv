@@ -1,0 +1,269 @@
+#:import Toolbar kivymd.toolbar.Toolbar
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+#:import Factory kivy.factory.Factory
+#:import MDList kivymd.list.MDList
+
+Intent:
+    id:_scr_mgr
+    transition:FadeTransition()
+	StartScreen:
+        name:'start'
+        BoxLayout:
+            canvas:
+                Color:
+                    rgba:(1,1,1,1)
+                Rectangle:
+                    size:self.size
+            orientation:'vertical'
+            padding:100
+            spacing:20
+            Image:
+                source:'logo.png'
+                anim_delay:0.05
+            MyButton:
+                text:'Start'
+                font_size:'25sp'
+                background_color:(1,0,1,1)
+                on_release:root.current='checkconn'
+                size_hint:1,0.25
+                border:(10,10,10,10)
+    CheckConnScreen:
+        name:'checkconn'
+        BoxLayout:
+            canvas:
+                Color:
+                    rgba:(1,1,1,1)
+                Rectangle:
+                    size:self.size
+            orientation:'vertical'
+            Image:
+                source:'loading.gif'
+                anim_delay:0.05
+            Label:
+                size_hint:1,0.5
+                text:'Checking Internet'
+                color:(0,0,0,1)
+                font_size:'25sp'
+                font_name:'BadScript-Regular'
+	LoginScreen:
+		name:'login'
+		email:_email
+		pwd:_pwd
+		error:_error
+		MyLayout:
+			AnchorLayout:
+				size_hint:1,1
+            	canvas:
+                	Rectangle:
+                    	source:'mail.png'
+                    	size:self.size
+            	BoxLayout:
+	                canvas:
+    	                Color:
+        	                #rgba:hex('#ffff00')
+            	            rgba:0,0,0,0.2
+                	    Rectangle:
+                    	    #source:'button_normal.png'
+                        	size:self.size
+                        	pos:self.pos
+                	anchor_x:'center'
+                	anchor_y:'center'
+                	orientation:'vertical'
+                	size_hint:0.5,0.5
+                	spacing:10
+                	padding:30
+                	LoginInput:
+	                    id:_email
+    	                hint_text:'Email'
+        	        LoginInput:
+            	        id:_pwd
+                	    password:True
+                    	hint_text:'Password'
+                	MyButton:
+                    	id:_submit
+                    	text:'Submit'
+                    	center:self.parent.get_center_x(),self.get_center_y()
+                    	size_hint:1,0.25
+                    	background_color:(0,1,64/255,1)
+                    	on_release:self.parent.parent.parent.parent.validate()
+                	Label:
+                    	id:_error
+                    	text:''
+                    	size_hint:1,0.1
+                    	color:(1,0,0,1)
+	GetAuthScreen:
+        name:'getauth'
+        la:_la
+        ver_code:_ver_code
+        MyLayout:
+			BoxLayout:
+				padding:175
+            	spacing:20
+				orientation:'vertical'
+            	Label:
+                	id:_la
+                	text:''
+                	color:(0,0,0,1)
+                	font_size:'25sp'
+            	TextInput:
+	                id:_ver_code
+                	hint_text:'Paste the verification code here'
+            	MyButton:
+	                text:'Submit' 
+                	background_color:(0,1,0,1)
+                	on_release:
+						self.parent.parent.parent.submit()  
+						root.current='login'
+	InboxScreen:
+		name:'inbox'
+	SentScreen:
+		name:'sent'
+	TrashScreen:
+		name:'trash'
+	ReadMail:		
+		name:'readmail'
+		fdisp:_fdisp
+		tdisp:_tdisp
+		sdisp:_sdisp
+		bdisp:_bdisp
+		MyLayout:
+			GridLayout:
+				orientation:'vertical'
+				padding:25
+				spacing:5
+				size_hint:1,0.75
+				cols:2
+				HeadLabel:
+					text:'From:'
+				DataLabel:
+					id:_fdisp
+				HeadLabel:
+					text:'To:'
+				DataLabel:
+					id:_tdisp
+				HeadLabel:
+					text:'Subject:'
+				DataLabel:
+					id:_sdisp
+					font_name:'Samanata'
+			TextInput:
+				id:_bdisp
+				text_color:(0,0,0,1)
+				padding:20
+				readonly:True
+				font_name:'Samanata'
+					
+	ComposeScreen:
+        name:'compose'
+        fadd:_from_email
+        tadd:_to_email
+        sub:_subject
+        mes:_message
+		MyLayout:
+        	BoxLayout:
+            	canvas:
+                	Rectangle:
+                    	source:'frame.png'
+                    	size:self.size
+            	orientation:'vertical'
+            	spacing:10
+            	padding:20
+            	Spinner:
+	                id:_from_email
+                	text:'From'
+                	size_hint:1,0.1
+                	halign:'left'
+                	background_color:(0,1,0,1)  if self.state=='down' else (0,0,1,1)
+                	values:self.parent.parent.parent.get_values()
+            	TextInput:
+	                id:_to_email
+    	            size_hint:1,0.1
+        	        hint_text:'To'
+            	    multiline:'False'
+            	TextInput:
+	                id:_subject
+    	            size_hint:1,0.1
+        	        hint_text:'Subject'
+            	    multiline:'False'
+            	TextInput:
+                	id:_message
+                	hint_text:'Type your meassage here'
+            	Button:
+	                id:_send
+    	            text:'Send'
+        	        size_hint:0.3,0.2
+            	    background_color:(1,0,1,1)
+                	font_size:'20sp'
+	                on_release:self.parent.parent.parent.send()
+	SwitchScreen:
+		name:'switch'
+		SwitchView:
+
+<MyLayout>:
+	orientation: 'vertical'
+	Toolbar:
+		id: toolbar
+		title: 'Email 2020'
+		background_color: app.theme_cls.primary_dark
+		left_action_items: [['menu', lambda x: app.nav_drawer.toggle()]]
+        right_action_items:[['refresh-sync',lambda x:app.syncmail() ]]
+
+
+<Navigator>:
+	NavigationDrawerIconButton:
+		icon: 'inbox'
+		text: 'Inbox'
+		on_release:app.root.current='inbox'
+	NavigationDrawerIconButton:
+		icon: 'arrow-right'
+		text: 'Sent mail'
+		on_release: app.root.current = 'sent'
+	NavigationDrawerIconButton:
+		icon: 'delete'
+		text: 'Trash'
+		on_release: app.root.current = 'trash'
+	NavigationDrawerIconButton:
+		icon: 'email'
+		text: 'Compose'
+		on_release:app.root.current ='compose'
+	NavigationDrawerIconButton:
+		icon: 'account-add'
+		text: 'Add Account'
+		on_release:app.root.current='login'
+	NavigationDrawerIconButton:
+		icon:'accounts-list'
+		text:'Switch Account'
+		on_release:app.root.current='switch'
+<LoginInput@TextInput>:
+    multiline:False
+    size_hint:1,0.25
+    font_size:'20sp'
+<MyButton@Button>:
+    font_name:'Roboto'
+    font_size:'20sp'
+    color:(1,1,1,1)
+<ChoiceButton@Button>:
+    font_name:'Roboto'
+    font_size:'40sp'
+    background_normal:'choice_button_normal.png'
+    background_down:'choice_button_down.png'
+<NoConnPopup>:
+    title:'Network Error'
+    auto_dismiss:False
+    size_hint:0.5,0.5
+    BoxLayout:
+        orientation:'vertical'
+        padding:50
+        Label:
+            text:'Check your internet connection'
+            font_size:'20sp'
+        Button:
+            text:'Dismiss'
+            background_color:(1,0,0,1)
+            on_release:root.dismiss()
+<DataLabel@MDLabel>:
+	theme_text_color:'Primary'
+	font_size:'20sp'
+<HeadLabel@MDLabel>:
+	theme_text_color:'Primary'
+	font_size:'25sp'
